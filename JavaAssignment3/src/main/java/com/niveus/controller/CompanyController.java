@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.niveus.businessmanager.Companybusinessmanager;
 import com.niveus.entity.Company;
 import com.niveus.exception.ResourceNotFoundException;
 import com.niveus.model.ResponseBody;
@@ -26,6 +27,9 @@ import com.niveus.repository.CompanyRepository;
 @RestController
 @RequestMapping("/api/v1")
 public class CompanyController {
+	
+	@Autowired
+	Companybusinessmanager companybusinessmanager;
 
 	@Autowired
 	private CompanyRepository companyRepository;
@@ -46,54 +50,26 @@ public class CompanyController {
 	@GetMapping("/employees/{id}")
 	public ResponseEntity<Company> getEmployeeById(@PathVariable(value = "id") int employeeId)
 			throws ResourceNotFoundException {
-		Company employee = companyRepository.findById(employeeId)
-				.orElseThrow(() -> new ResourceNotFoundException("Employee not found for this id :: " + employeeId));
-		return ResponseEntity.ok().body(employee);
+	
+		return companybusinessmanager.getEmployeeById(employeeId);
 	}
 
 	@PostMapping("/employees")
-	public ResponseEntity<List<ResponseBody>> createEmployee(@Valid @RequestBody Company employee) {
-		responseBody = new ArrayList<>();
-		responseStatus = new ResponseBody();
-		companyRepository.save(employee);
-
-		responseStatus.setStatusCode("200");
-		responseStatus.setStatusMessage("Record Inserted");
-		responseBody.add(responseStatus);
-		return ResponseEntity.ok(responseBody);
+	public ResponseEntity<List<ResponseBody>>  createEmployee(@Valid @RequestBody Company employee) {
+		return companybusinessmanager.createEmployee(employee);
 	}
 
 	@PutMapping("/employees/{id}")
 	public ResponseEntity<List<ResponseBody>> updateEmployee(@PathVariable(value = "id") int employeeId,
 			@Valid @RequestBody Company employeeDetails) throws ResourceNotFoundException {
-		responseBody = new ArrayList<>();
-		responseStatus = new ResponseBody();
-
-		Company employee = companyRepository.findById(employeeId)
-				.orElseThrow(() -> new ResourceNotFoundException("Employee not found for this id :: " + employeeId));
-
-		employee.setName(employeeDetails.getName());
-		employee.setAge(employeeDetails.getAge());
-		employee.setAddress(employeeDetails.getAddress());
-		employee.setSalary(employeeDetails.getSalary());
-		companyRepository.save(employee);
-		responseStatus.setStatusCode("200");
-		responseStatus.setStatusMessage("UPDATED");
-		responseBody.add(responseStatus);
-
-		return ResponseEntity.ok(responseBody);
+		return companybusinessmanager.updateEmployee(employeeId,employeeDetails);
+	
 
 	}
 
 	@DeleteMapping("/employees/{id}")
 	public Map<String, Boolean> deleteEmployee(@PathVariable(value = "id") int employeeId)
 			throws ResourceNotFoundException {
-		Company employee = companyRepository.findById(employeeId)
-				.orElseThrow(() -> new ResourceNotFoundException("Employee not found for this id :: " + employeeId));
-
-		companyRepository.delete(employee);
-		Map<String, Boolean> response = new HashMap<>();
-		response.put("DELETED", Boolean.TRUE);
-		return response;
+		return companybusinessmanager.deleteEmployee(employeeId);
 	}
 }
