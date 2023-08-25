@@ -29,6 +29,23 @@ public class Company implements Serializable {
 	@Column(name = "salary")
 	private int salary;
 
+	
+	
+	
+	public Company() {
+		
+	}
+
+	public Company(@NotNull int id, String name, int age, String address, int salary) {
+		this.id = id;
+		this.name = name;
+		this.age = age;
+		this.address = address;
+		this.salary = salary;
+	}
+
+	
+
 	public int getId() {
 		return id;
 	}
